@@ -1,5 +1,3 @@
-# Homework 2
+# Light-Material Interaction Visualization
 
-## DS-4630 / CS-5630 / CS-6630 Homework 2
-
-See https://www.dataviscourse.net/2023/homework/hw2/ for detailed instructions.
+## DS-4630 / CS-5630 / CS-6630 Final Project
