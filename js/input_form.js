@@ -25,9 +25,23 @@ document.addEventListener("DOMContentLoaded", function() {
     materialForm.addEventListener("submit", function(event) {
         event.preventDefault(); // Prevent the form from actually submitting
 
-        // Get the selected value from the dropdown
-        const material_type = document.getElementById("material_type").value;
+        const formData = {};
 
-        processUserInput(material_type)
+        // Iterate over form elements
+        for (const element of materialForm.elements) {
+            if (element.name) {
+                if (element.type === "radio" || element.type === "checkbox") {
+                    // Handle radio buttons and checkboxes
+                    if (element.checked) {
+                        formData[element.name] = element.value;
+                    }
+                } else {
+                    // Handle other input elements and selects
+                    formData[element.name] = element.value;
+                }
+            }
+        }
+
+        processUserInput(formData)
     });
 });

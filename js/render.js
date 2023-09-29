@@ -1,6 +1,6 @@
-function processUserInput(input) {
+function processUserInput(formData) {
     // TODO: for wenjian, do what you want with the user input here. You will receive this from input_form.js
-    console.log("User input: " + input);
+    console.log(formData);
 }
 
 
