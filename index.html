@@ -4,19 +4,39 @@
 <head>
   <meta charset="utf-8">
   <title>Light-Material Interaction Visualization </title>
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="js/render.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </head>
 
 <body>
   <div>
-    <h6>
-      Light-Material Interaction Visualization 
-    </h6>
+    <div class="container-fluid vh-100 text-center">
+      <div class="row">
+        <h3>
+          Light-Material Interaction Visualization 
+        </h3>
+      </div>
+      <div class="row">
+        <div class="col-8 canvas-col">
+          <canvas id="webgl-canvas"></canvas>
+        </div>
+        <div class="col-4">
+          <form id="myForm">
+            <input type="text" id="textInput" name="userInput">
+            <input type="submit" value="Submit">
+          </form>
+        </div>
+      </div>
+    </div>
 
-    <canvas id="webgl-canvas" width="800" height="600"></canvas>
+    
+
+
   </div>
 </body>
+
+<script src="js/render.js"></script>
 
 </html>
