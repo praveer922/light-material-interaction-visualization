@@ -4,35 +4,9 @@
 <head>
   <meta charset="utf-8">
   <title>Light-Material Interaction Visualization </title>
-  <style>
-    line {
-      stroke: #FF9200;
-      stroke-width: 6;
-    }
-
-    circle {
-      fill: gray;
-    }
-
-    .nodeGroup circle {
-      fill: rgb(99, 65, 149);
-      stroke: #fff;
-      stroke-width: 2px;
-    }
-
-    .label {
-      fill: #fff;
-      font-weight: bold;
-      text-anchor: middle;
-      font-size: 11px;
-      letter-spacing: 1px;
-      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    }
-  </style>
+  
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="js/Tree.js"></script>
-  <script src="js/Node.js"></script>
-  <script src="js/script.js"></script>
+  <script src="js/render.js"></script>
 </head>
 
 <body>
@@ -40,6 +14,8 @@
     <h6>
       Light-Material Interaction Visualization 
     </h6>
+
+    <canvas id="webgl-canvas" width="800" height="600"></canvas>
   </div>
 </body>
 
