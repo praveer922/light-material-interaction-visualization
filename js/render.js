@@ -1,18 +1,7 @@
-// Listen for user input
-document.getElementById("myForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-  
-    // Access the input field value
-    var userInput = document.getElementById("textInput").value;
-  
-    // Call a function or perform actions with userInput
-    processUserInput(userInput);
-  });
-
-  function processUserInput(input) {
-    // TODO: for wenjian, do what you want with the user input here.
-    console.log("User input: " + input);
-  }
+function processUserInput(formData) {
+    // TODO: for wenjian, do what you want with the user input here. You will receive this from input_form.js
+    console.log(formData);
+}
 
 
 // Initialize WebGL context

@@ -23,9 +23,60 @@
           <canvas id="webgl-canvas"></canvas>
         </div>
         <div class="col-4">
-          <form id="myForm">
-            <input type="text" id="textInput" name="userInput">
-            <input type="submit" value="Submit">
+          <form id="materialForm">
+            <label for="material_type">Material Type:</label>
+            <select id="material_type" name="material_type">
+                <option value="diffuse">Diffuse</option>
+                <option value="metal">Metal</option>
+                <option value="transparent">Transparent</option>
+            </select>
+
+            <!-- Container for dynamic content -->
+            <div id="dynamicForm">
+              <!-- Form for Diffuse (initially hidden) -->
+              <div id="diffuseForm" style="display: none;">
+                <label for="albedo">Albedo:</label>
+                <br>
+                <label for="red">Red (0-255):</label>
+                <input type="number" id="red" name="red" min="0" max="255">
+                <br>
+
+                <label for="green">Green (0-255):</label>
+                <input type="number" id="green" name="green" min="0" max="255">
+                <br>
+
+                <label for="blue">Blue (0-255):</label>
+                <input type="number" id="blue" name="blue" min="0" max="255">
+                <br>
+              </div>
+            
+              <!-- Form for Metal (initially hidden) -->
+              <div id="metalForm" style="display: none;">
+                <label for="metal_roughness">Roughness:</label>
+                <input type="number" id="metal_roughness" name="metal_roughness" min="0" max="1" step="0.1">
+                <br>
+                <label for="metal_type">Metal Type:</label>
+                <select id="metal_type" name="metal_type">
+                  <option value="copper">Copper</option>
+                  <option value="silver">Silver</option>
+                  <option value="gold">Gold</option>
+              </select>
+
+              </div>
+            
+              <!-- Form for Transparent (initially hidden) -->
+              <div id="transparentForm" style="display: none;">
+                <label for="transparent_roughness">Roughness:</label>
+                <input type="number" id="transparent_roughness" name="transparent_roughness" min="0" max="1" step="0.1">
+                <br>
+                <label for="refractive_index">Refractive Index:</label>
+                <input type="number" id="refractive_index" name="refractive_index" step="0.1">
+                <br>
+
+              </div>
+            </div>
+
+            <input type="submit" value="Add">
           </form>
         </div>
       </div>
@@ -36,7 +87,7 @@
 
   </div>
 </body>
-
+<script src="js/input_form.js"></script>
 <script src="js/render.js"></script>
 
 </html>
