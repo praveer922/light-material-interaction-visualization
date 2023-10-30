@@ -53,6 +53,19 @@ function Reflect(wo, n) {
     return wo_negative.add(n.multiplyScalar(2. * wo_original.dot(n)));
 }
 
+function Refract(wi, n, eta) {
+    let cosThetaI = wi.dot(n);
+    let sin2ThetaI = Math.max(0., 1. - cosThetaI * cosThetaI);
+    let sin2ThetaT = eta * eta * sin2ThetaI;
+
+    if (sin2ThetaT >= 1) return new THREE.Vector3(0, 0, 0);
+
+    let cosThetaT = Math.sqrt(1. - sin2ThetaT);
+    let wi_negative = wi.negate();
+    let wt = wi_negative.multiplyScalar(eta).add(n.multiplyScalar(eta*cosThetaI - cosThetaT));
+    return wt;
+}
+
 function SameHemisphere(w, wp) {
     return w.z * wp.z > 0;
 }
@@ -179,7 +192,7 @@ function Sample_wh(wo, u, alphax, alphay) {
     // console.log('u: ', u.x, u.y);
     wh = TrowbridgeReitzSample(flip ? -wo : wo, alphax, alphay, u.x, u.y);
     if (flip) wh = -wh;
-
+    //console.log('wh: ', wh);
     return wh;
 }
 
@@ -194,5 +207,23 @@ function SampleConductor(wo, u, alphax, alphay) {
     return wi;
 }
 
-let wo = new THREE.Vector3(0.3, 0.3, 0.3);
-console.log('wi: ', SampleConductor(wo.normalize(), new THREE.Vector2(GetRandomSample(), GetRandomSample()), 0.5, 0.5));
+// let wo = new THREE.Vector3(0.3, 0.3, 0.3);
+// console.log('wi: ', SampleConductor(wo.normalize(), new THREE.Vector2(GetRandomSample(), GetRandomSample()), 0.5, 0.5));
+
+// ******************************************************
+// ***************** Sample Dielectric ******************
+// ******************************************************
+
+function SampleDielectric(wo, u, alphax, alphay, etaA, etaB) {
+    if (wo.z == 0) return new THREE.Vector3(0., 0., 0.);
+    let wh = Sample_wh(wo, u, alphax, alphay);
+    if (wo.dot(wh) < 0) return new THREE.Vector3(0., 0., 0.);
+
+    let eta = CosTheta(wo) > 0 ? (etaA / etaB) : (etaB / etaA);
+    let wi = Refract(wo, wh, eta);
+    if (wi.length() == 0) return new THREE.Vector3(0., 0., 0.);
+    return wi;
+}
+
+//let wo = new THREE.Vector3(0.3, 0.3, 0.3);
+//console.log('wi: ', SampleDielectric(wo.normalize(), new THREE.Vector2(GetRandomSample(), GetRandomSample()), 0.5, 0.5, 1., 1.5));
