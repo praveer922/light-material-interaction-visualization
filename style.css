@@ -6,6 +6,15 @@
   margin: 20px;
 }
 
+.row {
+  margin-bottom: 20px;
+}
+
+.hist, .log {
+  border: 1px solid black;
+  height: 300px;
+}
+
 .dashboard {
 
   margin: 50px;
