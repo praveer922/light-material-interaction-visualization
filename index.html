@@ -23,51 +23,68 @@
 </head>
 
 <body>
-  <div>
+    <header>
+      <h3>
+        Light-Material Interaction Visualization
+      </h3>
+    </header>
     <div class="container-fluid vh-100 text-center">
-      <div class="row title">
-        <h3>
-          Light-Material Interaction Visualization
-        </h3>
-      </div>
       <div class="dashboard">
-      <div class="row">
-        <div class="col-8 canvas-col">
-          <h3>Render</h3>
-          <div class="image-container">
-            <img id="render_img" src="assets/diffuse_cyan.png">
+
+      <div class="row">  
+        <div class="col-6">
+          <div class="dark-gray-div">
+            <h3>Render</h3>
+            <div class="image-container">
+              <img id="render_img" src="assets/diffuse_cyan.png">
+            </div>
           </div>
         </div>
-        <div class="col-4">
-          <form id="materialForm">
-            <label for="material">Select Material:</label><br><br>
-            <select id="material">
-              <optgroup label="Diffuse">
-                <option value="0">Cyan</option>
-                <option value="1">Orange</option>
-                <option value="2">Purple</option>
-              </optgroup>
-              <optgroup label="Conductor">
-                <option value="3">Aluminum</option>
-                <option value="4">Gold</option>
-                <option value="5">Copper</option>
-                <option value="6">Tungsten</option>
-              </optgroup>
-              <optgroup label="Dielectric">
-                <option value="7">Dielectric</option>
-              </optgroup>
-            </select>
-            <br><br>
-            <input type="submit" value="Select">
-          </form>
+
+        <div class="col-6">
+          <div class="dark-gray-div">
+            <h3>Material Selection</h3>
+            <p class="intro">With this dashboard, you can simulate the effects of light interaction with different materials, as commonly modelled in the field of computer graphics.
+              When light hits an object, it behaves differently depending on the kind of material the object is made out of. The different windows here can give you an idea of the kind of behaviour light exhibits on different materials.
+            </p>
+            <p>To begin, choose a material:</p>
+            <form id="materialForm">
+              <select id="material">
+                <optgroup label="Diffuse">
+                  <option value="0">Cyan</option>
+                  <option value="1">Orange</option>
+                  <option value="2">Purple</option>
+                </optgroup>
+                <optgroup label="Conductor">
+                  <option value="3">Aluminum</option>
+                  <option value="4">Gold</option>
+                  <option value="5">Copper</option>
+                  <option value="6">Tungsten</option>
+                </optgroup>
+                <optgroup label="Dielectric">
+                  <option value="7">Dielectric</option>
+                </optgroup>
+              </select>
+              <br><br>
+              <input type="submit" value="Select">
+            </form>
+          </div>
         </div>
       </div>
+
       <div class="row">
-        <div class="col-8 canvas-col scene">
+        <div class="col-8">
+          <div class="dark-gray-div">
           <h3>Light Behaviour Visualization</h3>
+          <div class="scene">
+          </div>
+          </div>
         </div>
-        <div class="col-4 control panel">
+        <div class="col-4"> 
+          <div class="dark-gray-div">
           <h3>Control panel</h3>
+          <div class="control-panel"></div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -80,7 +97,6 @@
       </div>
     </div>
     </div>
-  </div>
 </body>
 
 <script src="js/input_form.js"></script>
