@@ -1,13 +1,39 @@
-.canvas-col {
-  text-align: center; 
+body {
+  background-color: black;
+  color: white; /* You may want to set the text color to white or another contrasting color */
 }
 
-.title {
-  margin: 20px;
+.dark-gray-div {
+  background-color: rgb(15, 15, 15);
+  color: white;
+  border-radius: 10px;
+  height: 100%
 }
+
+header {
+  background-color: rgb(34, 34, 39);
+  padding: 10px;
+  text-align: left;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  color: white;
+  border-radius: 10px;
+}
+
+h3 {
+  padding-top:5px;
+}
+
+p {
+  text-align: left;
+  padding-left: 20px;
+  padding-top:5px;
+}
+
 
 .row {
-  margin-bottom: 20px;
+  margin: 10px;
 }
 
 .hist, .log {
@@ -15,17 +41,43 @@
   height: 300px;
 }
 
-.dashboard {
-
-  margin: 50px;
-}
-
 .image-container {
   width: 100%; /* Make the image container take up the full width of the column */
   text-align: center; /* Center-align the image horizontally */
+  padding-left:10px;
+  padding-right:10px;
+  margin-bottom:15px;
+}
+
+.scene {
+  text-align: center; /* Center-align the image horizontally */
+  padding-left:10px;
+  padding-right:10px;
+  margin-bottom:15px;
+}
+
+.control-panel {
+  text-align: center; /* Center-align the image horizontally */
+  padding-left:10px;
+  padding-right:10px;
+  margin-bottom:15px;
+}
+
+.dg.main.a {
+  width:100% !important;
+  height: 100% !important;
+  text-align: center !important; /* Center-align the image horizontally */
+  margin-right:0px !important;
+
+}
+
+canvas {
+  width: 100%  !important; 
+  height: 100%  !important; 
 }
 
 .image-container img {
   max-width: 100%; /* Ensure the image doesn't exceed the container's width */
   height: auto; /* Maintain the image's aspect ratio */
 }
+

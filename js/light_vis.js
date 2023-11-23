@@ -21,12 +21,12 @@ function init() {
 
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5);
     const sceneElement = document.querySelector('.scene');
     sceneElement.appendChild(renderer.domElement);
+    renderer.setSize(sceneElement.clientWidth, sceneElement.clientHeight);
 
     const gui = new GUI();
-    const controlPanelElement = document.querySelector('.control.panel');
+    const controlPanelElement = document.querySelector('.control-panel');
     controlPanelElement.appendChild(gui.domElement);
     gui.addColor(guiControls, 'sphereColor').onChange((color) => {
         sphere.material.color.set(color);
