@@ -5,49 +5,65 @@ import * as THREE from 'three'
 // **************************************************************
 
 function Clamp(num, min, max) {
-    return num <= min 
-        ? min 
-        : num >= max 
-            ? max 
+    return num <= min
+        ? min
+        : num >= max
+            ? max
             : num
 }
 
-function GetRandomSample() {
+export function GetRandomSample() {
     // console.log('random: ', Math.random());
     return Math.random();
 }
 
-function CosTheta(w) { return w.z; }
-function Cos2Theta(w) { return w.z * w.z; }
-function AbsCosTheta(w) { return Math.abs(w.z); }
+function CosTheta(w) {
+    return w.z;
+}
+
+function Cos2Theta(w) {
+    return w.z * w.z;
+}
+
+function AbsCosTheta(w) {
+    return Math.abs(w.z);
+}
+
 function Sin2Theta(w) {
     return Math.max(0., 1. - Cos2Theta(w));
 }
+
 function SinTheta(w) {
     return Math.sqrt(Sin2Theta(w));
 }
+
 function TanTheta(w) {
     return SinTheta(w) / CosTheta(w);
 }
+
 function Tan2Theta(w) {
     return Sin2Theta(w) / Cos2Theta(w);
 }
+
 function CosPhi(w) {
     let sinTheta = SinTheta(w);
     return (sinTheta == 0) ? 1 : Clamp(w.x / sinTheta, -1, 1);
 }
+
 function SinPhi(w) {
     let sinTheta = SinTheta(w);
     return (sinTheta == 0) ? 0 : Clamp(w.y / sinTheta, -1, 1);
 }
+
 function Cos2Phi(w) {
     return CosPhi(w) * CosPhi(w);
 }
+
 function Sin2Phi(w) {
     return SinPhi(w) * SinPhi(w);
 }
 
-function Reflect(wo, n) {
+export function Reflect(wo, n) {
     let wo_original = wo.clone();
     let wo_negative = wo.negate();
     return wo_negative.add(n.multiplyScalar(2. * wo_original.dot(n)));
@@ -62,11 +78,11 @@ function Refract(wi, n, eta) {
 
     let cosThetaT = Math.sqrt(1. - sin2ThetaT);
     let wi_negative = wi.negate();
-    let wt = wi_negative.multiplyScalar(eta).add(n.multiplyScalar(eta*cosThetaI - cosThetaT));
+    let wt = wi_negative.multiplyScalar(eta).add(n.multiplyScalar(eta * cosThetaI - cosThetaT));
     return wt;
 }
 
-function SameHemisphere(w, wp) {
+export function SameHemisphere(w, wp) {
     return w.z * wp.z > 0;
 }
 
@@ -83,10 +99,9 @@ function ConcentricSampleDisk(u) {
     if (Math.abs(uOffset.x) > Math.abs(uOffset.y)) {
         r = uOffset.x;
         theta = Math.PI / 4. * (uOffset.y / uOffset.x);
-    }
-    else {
+    } else {
         r = uOffset.y;
-        theta = Math.PI/2. - Math.PI/4. * (uOffset.x / uOffset.y);
+        theta = Math.PI / 2. - Math.PI / 4. * (uOffset.x / uOffset.y);
     }
     // console.log('costheta: ', Math.cos(theta));
     let sampled = new THREE.Vector2(Math.cos(theta), Math.sin(theta)).multiplyScalar(r);
@@ -104,7 +119,7 @@ function CosineSampleHemisphere(u) {
 // ****************** Diffuse ********************
 // ***********************************************
 
-function SampleDiffuse(u) {
+export function SampleDiffuse(u) {
     let wi = CosineSampleHemisphere(u);
     // console.log('wi: ', wi);
     return wi;
@@ -113,8 +128,9 @@ function SampleDiffuse(u) {
 function ComputeDiffuse(color) {
     return color.divideScalar(Math.PI);
 }
+
 // ************** TEST *****************
-// console.log(sampleDiffuse(new THREE.Vector2(getRandomSample(), getRandomSample())));
+//console.log(sampleDiffuse(new THREE.Vector2(getRandomSample(), getRandomSample())));
 // *************************************
 
 // ********************************************************
@@ -156,11 +172,11 @@ function TrowbridgeReitzSample11(cosTheta, U1, U2) {
         S = -1.;
         U2 = 2. * (.5 - U2);
     }
-    let z = 
+    let z =
         (U2 * (U2 * (U2 * 0.27385 - 0.73369) + 0.46341)) /
         (U2 * (U2 * (U2 * 0.093073 + 0.309420) - 1.000000) + 0.597999);
     slope_y = S * z * Math.sqrt(1. + slope_x * slope_x);
-    
+
     return new THREE.Vector2(slope_x, slope_y);
 }
 
@@ -185,18 +201,19 @@ function TrowbridgeReitzSample(wi, alpha_x, alpha_y, U1, U2) {
     return sampled;
 }
 
-function Sample_wh(wo, u, alphax, alphay) {
+export function Sample_wh(wo, u, alphax, alphay) {
     let wh;
     // sample visible area
     let flip = wo.z < 0;
     // console.log('u: ', u.x, u.y);
-    wh = TrowbridgeReitzSample(flip ? -wo : wo, alphax, alphay, u.x, u.y);
-    if (flip) wh = -wh;
+    let neg_wo = wo.clone().negate();
+    wh = TrowbridgeReitzSample(flip ? neg_wo : wo, alphax, alphay, u.x, u.y);
+    if (flip) wh.negate();
     //console.log('wh: ', wh);
     return wh;
 }
 
-function SampleConductor(wo, u, alphax, alphay) {
+export function SampleConductor(wo, u, alphax, alphay) {
     if (wo.z == 0) return new THREE.Vector3(0., 0., 0.);
     let wh = Sample_wh(wo, u, alphax, alphay);
     // console.log('wh: ', wh);
@@ -225,5 +242,5 @@ function SampleDielectric(wo, u, alphax, alphay, etaA, etaB) {
     return wi;
 }
 
-//let wo = new THREE.Vector3(0.3, 0.3, 0.3);
+//let wo = new THREE.Vector3(0, 1, 0);
 //console.log('wi: ', SampleDielectric(wo.normalize(), new THREE.Vector2(GetRandomSample(), GetRandomSample()), 0.5, 0.5, 1., 1.5));
