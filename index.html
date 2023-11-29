@@ -37,6 +37,7 @@
             <h3>Render</h3>
             <div class="image-container">
               <img id="render_img" src="assets/diffuse_cyan.png">
+              <canvas id="hiddenCanvas" style="display:none;"></canvas>
             </div>
           </div>
         </div>
@@ -88,10 +89,15 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-6 hist">
+        <div class="col-10">
+          <div class="dark-gray-div">
           <h3>Color Histogram</h3>
+          <div class="histogram-container">
+            <svg id="histogram"></svg>
+          </div>
+          </div>
         </div>
-        <div class="col-6 log">
+        <div class="col-2 log">
           <h3>Console Log</h3>
         </div>
       </div>
@@ -99,6 +105,7 @@
     </div>
 </body>
 
+<script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="js/input_form.js"></script>
 <script src="js/render.js"></script>
 <script src="js/sample.js" type="module"></script>
