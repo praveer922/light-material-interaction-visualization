@@ -10,4 +10,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         processUserInput(selectedValue)
     });
+
+    const histogramForm = document.getElementById("histogramForm");
+
+    histogramForm.addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the form from actually submitting
+
+        processPixelArray();
+    });
 });

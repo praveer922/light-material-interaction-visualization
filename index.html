@@ -94,6 +94,17 @@
           <h3>Color Histogram</h3>
           <div class="histogram-container">
             <svg id="histogram"></svg>
+            <form id="histogramForm">
+              <label for="colorChannel">Choose color channel:</label>
+              <select id="colorChannel" name="colorChannel">
+                <option value="grayscale" selected>Grayscale</option>
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+                <option value="blue">Blue</option>
+              </select>
+          
+              <button type="submit">Apply</button>
+            </form>
           </div>
           </div>
         </div>

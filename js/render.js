@@ -50,28 +50,61 @@ function drawHistogram() {
       context.drawImage(image, 0, 0, image.width, image.height);
 
       const imageData = context.getImageData(0, 0, image.width, image.height);
-      const pixels = imageData.data;
-      // Now pixelArray contains the pixel data in RGBA format
-      // Convert pixelArray to grayscale frequencies array
-      const grayscaleFrequencies = Array.from({ length: 256 }, () => 0);
-
-      for (let i = 0; i < pixels.length; i += 4) {
-        // Calculate grayscale value (average of RGB channels)
-        const grayscale = Math.round((pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3);
-        grayscaleFrequencies[grayscale]++;
-      }
-      pixelArray = grayscaleFrequencies
+      pixelArray = imageData.data;
       processPixelArray();
     };
 
 }
 
 function processPixelArray() {
+    const selectedChannel = document.getElementById("colorChannel").value;
+
+    var pixels;
+
+    if (selectedChannel == "grayscale") {
+        const grayscaleFrequencies = Array.from({ length: 256 }, () => 0);
+
+        for (let i = 0; i < pixelArray.length; i += 4) {
+            // Calculate grayscale value (average of RGB channels)
+            const grayscale = Math.round((pixelArray[i] + pixelArray[i + 1] + pixelArray[i + 2]) / 3);
+            grayscaleFrequencies[grayscale]++;
+        }
+        pixels = grayscaleFrequencies;
+    } else if (selectedChannel == "red") {
+        const redFrequencies = Array.from({ length: 256 }, () => 0);
+
+        for (let i = 0; i < pixelArray.length; i += 4) {
+            // get red value
+            const red = pixelArray[i];
+            redFrequencies[red]++;
+        }
+        pixels = redFrequencies;
+    } else if (selectedChannel == "green") {
+        const greenFrequencies = Array.from({ length: 256 }, () => 0);
+
+        for (let i = 0; i < pixelArray.length; i += 4) {
+            // get green value
+            const green = pixelArray[i+1];
+            greenFrequencies[green]++;
+        }
+        pixels = greenFrequencies;
+    } else if (selectedChannel == "blue") {
+        const blueFrequencies = Array.from({ length: 256 }, () => 0);
+
+        for (let i = 0; i < pixelArray.length; i += 4) {
+            // get blue value
+            const blue = pixelArray[i+2];
+            blueFrequencies[blue]++;
+        }
+        pixels = blueFrequencies;
+    }
+
+
     const svgWidth = document.getElementById("histogram").clientWidth;
     const svgHeight = document.getElementById("histogram").clientHeight;
 
-    // Find the maximum value in pixelArray
-    var maxValue = d3.max(pixelArray);
+    // Find the maximum value in pixels
+    var maxValue = d3.max(pixels);
     maxValue = maxValue + 100;
 
     const svg = d3.select("#histogram");
@@ -100,12 +133,12 @@ function processPixelArray() {
     .attr("fill", "none"); // Set fill to none if you only want the stroke
 
     svg.selectAll("rect")
-      .data(pixelArray)
+      .data(pixels)
       .enter()
       .append("rect")
       .attr("x", (d, i) => (svgWidth/255)*i)
       .attr("y",d => (svgHeight-15) - (d/maxValue)*(svgHeight-15))
-      .attr("width", svgWidth / pixelArray.length)
+      .attr("width", svgWidth / pixels.length)
       .attr("height", d => (d/maxValue)*(svgHeight-15) )
       .attr("fill", "white");
 
@@ -140,6 +173,16 @@ function processPixelArray() {
         .attr("fill", "white") // Set text color to white
         .attr("font-size", "7px") // Set font size
         .attr("text-anchor", "middle"); // Align text to the center
+    }
+
+
+    // set color of rects
+    if (selectedChannel=="red") {
+        svg.selectAll("rect").attr("fill", "red");
+    } else if (selectedChannel=="green") {
+        svg.selectAll("rect").attr("fill", "green");
+    } else if (selectedChannel=="blue") {
+        svg.selectAll("rect").attr("fill", "blue");
     }
 
 
