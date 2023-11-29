@@ -36,11 +36,6 @@ p {
   margin: 10px;
 }
 
-.hist, .log {
-  border: 1px solid black;
-  height: 300px;
-}
-
 .image-container {
   width: 100%; /* Make the image container take up the full width of the column */
   text-align: center; /* Center-align the image horizontally */
@@ -70,6 +65,21 @@ p {
   margin-right:0px !important;
 
 }
+
+.histogram-container {
+  width: 100%; /* Make the image container take up the full width of the column */
+  text-align: center; /* Center-align the image horizontally */
+  padding-left:10px;
+  padding-right:10px;
+  margin-bottom:15px;
+}
+
+#histogram {
+  width: 100% !important;
+  height: 100%  !important; 
+  min-height: 350px !important; 
+}
+
 
 canvas {
   width: 100%  !important; 
