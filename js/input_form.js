@@ -18,4 +18,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         processPixelArray();
     });
+
+    const roughnessForm = document.getElementById("roughnessForm");
+
+    histogramForm.addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the form from actually submitting
+        
+        // replace this with the function that applies the slider value
+        updateSlider();
+    });
 });
