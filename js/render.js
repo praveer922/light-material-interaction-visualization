@@ -188,3 +188,7 @@ function processPixelArray() {
 
 }
 
+function updateSliderText(value) {
+    document.getElementById("sliderValue").innerText = `Roughness Value: ${value}`;
+}
+
