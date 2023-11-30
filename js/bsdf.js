@@ -4,6 +4,7 @@ function microfacetD(x, a) {
 
 function drawMicrofacetBSDF(roughness) {
   let bsdfElement = document.getElementById("bsdf");
+  bsdfElement.innerHTML = '';
   let bounds = bsdfElement.getBoundingClientRect();
   let width = bounds.width;
   let height = bounds.height;
@@ -34,8 +35,9 @@ function drawMicrofacetBSDF(roughness) {
   });
 }
 
-function drawDiffuseBSDF(s) {
+function drawDiffuseBSDF() {
   let bsdfElement = document.getElementById("bsdf");
+  bsdfElement.innerHTML = '';
   let bounds = bsdfElement.getBoundingClientRect();
   let width = bounds.width;
   let height = bounds.height;
