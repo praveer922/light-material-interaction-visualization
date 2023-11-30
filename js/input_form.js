@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", function() {
         event.preventDefault(); // Prevent the form from actually submitting
 
         const materialSelect = document.getElementById("material");
-        const selectedValue = materialSelect.value;
+        const selectedValue = materialSelect.value; 
 
-        processUserInput(selectedValue)
+        processUserInput(selectedValue);
     });
 
     const histogramForm = document.getElementById("histogramForm");
@@ -27,3 +27,4 @@ document.addEventListener("DOMContentLoaded", function() {
         updateSlider();
     });
 });
+
