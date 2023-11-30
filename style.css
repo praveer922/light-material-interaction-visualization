@@ -97,6 +97,14 @@ p {
   height: 100% !important;
 }
 
+#bsdf .function-plot .canvas text.x.axis-label{
+  fill: white;
+}
+
+#bsdf .function-plot .canvas text.y.axis-label{
+  fill: white;
+}
+
 #histogram {
   width: 100% !important;
   height: 100%  !important; 

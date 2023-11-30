@@ -20,8 +20,14 @@ function drawMicrofacetBSDF(roughness) {
     disablePan: true,
     width,
     height,
-    xAxis: { domain: [-89, 89] },
-    yAxis: { domain: [0, highest_y+1] },
+    xAxis: { 
+      label: 'Angle',
+      domain: [-89, 89],
+    },
+    yAxis: { 
+      label: 'Probability Density',
+      domain: [-0.5, highest_y+1] 
+    },
     data: [
       {
         fn: `(${alpha}^2)/(PI*((cos(x*PI/180))^4) * ((${alpha}^2)+((tan(x*PI/180))^2))^2)`,
@@ -49,8 +55,14 @@ function drawDiffuseBSDF() {
     disablePan: true,
     width,
     height,
-    xAxis: { domain: [-89, 89] },
-    yAxis: { domain: [0, 1] },
+    xAxis: { 
+      label: 'Angle',
+      domain: [-89, 89] 
+    },
+    yAxis: {
+      label: 'Probability Density',
+      domain: [0, 1] 
+    },
     data: [
       {
         fn: `1/PI`,
