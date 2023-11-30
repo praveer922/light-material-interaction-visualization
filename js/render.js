@@ -194,5 +194,18 @@ function updateSliderText(value) {
 
 function updateSlider() {
     const roughnessValue = document.getElementById("slider").value;
-    drawMicrofacetBSDF(roughnessValue);
+    const materialSelect = document.getElementById("material");
+    const selectedValue = materialSelect.value;
+
+    if (selectedValue<=2) {
+        drawDiffuseBSDF();
+        var roughnessForm = document.getElementById("roughnessForm");
+        // Hide the form
+        roughnessForm.style.display = "none";
+    } else {
+        drawMicrofacetBSDF(roughnessValue);
+        var roughnessForm = document.getElementById("roughnessForm");
+        // Hide the form
+        roughnessForm.style.display = "block";
+    }
 }
