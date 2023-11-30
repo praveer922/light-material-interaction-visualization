@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GUI} from "dat.gui";
-import {GetRandomSample, SampleConductor, SampleDiffuse, SampleDielectric} from "./sample";
+import {GetRandomSample, SampleConductor, SampleDiffuse, SampleDielectric} from "./sample.js";
 
 let camera, scene, renderer, arrow;
 
@@ -43,6 +43,8 @@ function init() {
     gui.add(guiControls, 'sampleCount', 1, 1000).step(1);
     gui.add(guiControls, 'sampleMethod', ['Diffuse', 'Conductor', 'Dielectric']);
 
+    const guiElement = document.querySelector('.control-panel');
+    guiElement.appendChild(gui.domElement);
 
     // camera
 
