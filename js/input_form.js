@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     const materialForm = document.getElementById("materialForm");
+    processUserInput(0);
     
 
     materialForm.addEventListener("submit", function(event) {
