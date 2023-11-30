@@ -192,3 +192,8 @@ function updateSliderText(value) {
     document.getElementById("sliderValue").innerText = `Roughness Value: ${value}`;
 }
 
+function updateSlider() {
+    const roughnessValue = document.getElementById("slider").value;
+    drawBSDF(roughnessValue);
+}
+

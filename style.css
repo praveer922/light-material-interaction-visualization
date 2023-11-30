@@ -74,6 +74,29 @@ p {
   margin-bottom:15px;
 }
 
+#bsdf {
+  width: 100%; /* Make the image container take up the full width of the column */
+  text-align: center; /* Center-align the image horizontally */
+  padding-left:10px;
+  padding-right:10px;
+  margin-bottom:15px;
+}
+
+#bsdf svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#bsdf svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#bsdf svg .canvas{
+  width: 100% !important;
+  height: 100% !important;
+}
+
 #histogram {
   width: 100% !important;
   height: 100%  !important; 
