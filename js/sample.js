@@ -65,7 +65,7 @@ function Sin2Phi(w) {
 
 export function Reflect(wo, n) {
     let wo_original = wo.clone();
-    let wo_negative = wo.negate();
+    let wo_negative = wo.clone().negate();
     return wo_negative.add(n.multiplyScalar(2. * wo_original.dot(n)));
 }
 
@@ -77,7 +77,7 @@ function Refract(wi, n, eta) {
     if (sin2ThetaT >= 1) return new THREE.Vector3(0, 0, 0);
 
     let cosThetaT = Math.sqrt(1. - sin2ThetaT);
-    let wi_negative = wi.negate();
+    let wi_negative = wi.clone().negate();
     let wt = wi_negative.multiplyScalar(eta).add(n.multiplyScalar(eta * cosThetaI - cosThetaT));
     return wt;
 }
@@ -215,12 +215,13 @@ export function Sample_wh(wo, u, alphax, alphay) {
 
 export function SampleConductor(wo, u, alphax, alphay) {
     if (wo.z === 0) return new THREE.Vector3(0., 0., 0.);
-    let wh = Sample_wh(wo, u, alphax, alphay);
+    let wh = Sample_wh(wo.clone(), u, alphax, alphay);
     // console.log('wh: ', wh);
     if (wo.dot(wh) < 0) return new THREE.Vector3(0., 0., 0.);
+    //console.log("wo: ", wo)
     let wi = Reflect(wo, wh);
     if (!SameHemisphere(wo, wi)) return new THREE.Vector3(0., 0., 0.);
-
+    //console.log("wo, wi: ",wo,wi);
     return wi;
 }
 
@@ -239,6 +240,7 @@ export function SampleDielectric(wo, u, alphax, alphay, etaA, etaB) {
     let eta = CosTheta(wo) > 0 ? (etaA / etaB) : (etaB / etaA);
     let wi = Refract(wo, wh, eta);
     if (wi.length() === 0) return new THREE.Vector3(0., 0., 0.);
+    console.log("wo, wi: ",wo,wi);
     return wi;
 }
 
