@@ -1,5 +1,3 @@
-drawHistogram();
-
 function processUserInput(formData) {
   var filepath;
 
@@ -34,6 +32,7 @@ function processUserInput(formData) {
   img.src = filepath;
 
   drawHistogram();
+  updateSlider();
 
 }
 
@@ -190,6 +189,7 @@ function processPixelArray() {
 
 function updateSliderText(value) {
     document.getElementById("sliderValue").innerText = `Roughness Value: ${value}`;
+
 }
 
 function updateSlider() {
