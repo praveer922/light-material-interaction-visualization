@@ -214,7 +214,7 @@ export function Sample_wh(wo, u, alphax, alphay) {
 }
 
 export function SampleConductor(wo, u, alphax, alphay) {
-    if (wo.z == 0) return new THREE.Vector3(0., 0., 0.);
+    if (wo.z === 0) return new THREE.Vector3(0., 0., 0.);
     let wh = Sample_wh(wo, u, alphax, alphay);
     // console.log('wh: ', wh);
     if (wo.dot(wh) < 0) return new THREE.Vector3(0., 0., 0.);
@@ -232,13 +232,13 @@ export function SampleConductor(wo, u, alphax, alphay) {
 // ******************************************************
 
 export function SampleDielectric(wo, u, alphax, alphay, etaA, etaB) {
-    if (wo.z == 0) return new THREE.Vector3(0., 0., 0.);
+    if (wo.z === 0) return new THREE.Vector3(0., 0., 0.);
     let wh = Sample_wh(wo, u, alphax, alphay);
     if (wo.dot(wh) < 0) return new THREE.Vector3(0., 0., 0.);
 
     let eta = CosTheta(wo) > 0 ? (etaA / etaB) : (etaB / etaA);
     let wi = Refract(wo, wh, eta);
-    if (wi.length() == 0) return new THREE.Vector3(0., 0., 0.);
+    if (wi.length() === 0) return new THREE.Vector3(0., 0., 0.);
     return wi;
 }
 
