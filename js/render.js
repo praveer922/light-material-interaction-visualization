@@ -194,6 +194,5 @@ function updateSliderText(value) {
 
 function updateSlider() {
     const roughnessValue = document.getElementById("slider").value;
-    drawBSDF(roughnessValue);
+    drawMicrofacetBSDF(roughnessValue);
 }
-
