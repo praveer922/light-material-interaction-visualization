@@ -231,7 +231,7 @@ export function SampleConductor(wo, u, alphax, alphay) {
 // ***************** Sample Dielectric ******************
 // ******************************************************
 
-function SampleDielectric(wo, u, alphax, alphay, etaA, etaB) {
+export function SampleDielectric(wo, u, alphax, alphay, etaA, etaB) {
     if (wo.z == 0) return new THREE.Vector3(0., 0., 0.);
     let wh = Sample_wh(wo, u, alphax, alphay);
     if (wo.dot(wh) < 0) return new THREE.Vector3(0., 0., 0.);

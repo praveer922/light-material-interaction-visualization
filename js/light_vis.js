@@ -1,18 +1,23 @@
 import * as THREE from 'three';
-
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GUI} from "dat.gui";
-import {GetRandomSample, SampleConductor, SampleDiffuse} from "./sample";
-import {update} from "three/addons/libs/tween.module";
+import {GetRandomSample, SampleConductor, SampleDiffuse, SampleDielectric} from "./sample";
 
-let group, camera, scene, renderer, arrow, hemisphere;
+let camera, scene, renderer, arrow;
+
+let arrowPosition;
+
+let wis = [];
+let wiArrows = [];
+
+let isSamplingActive = false;
+let currentSampleCount = 0;
 
 const guiControls = {
-    sphereColor: 0xffff00, // Initial color of the sphere
     arrowRadius: 20,      // Initial radius of the arrow's position
-    arrowAzimuth: 0,      // Initial azimuthal angle (in degrees)
+    arrowAzimuth: 183,      // Initial azimuthal angle (in degrees)
     arrowPolar: 45,        // Initial polar angle (in degrees)
-    segments: 8,         // Number of segments of the sphere
+    sampleCount: 10, sampleMethod: 'Conductor', sampleRoughness: 0.5,
 };
 
 init();
@@ -29,63 +34,68 @@ function init() {
     sceneElement.appendChild(renderer.domElement);
 
     const gui = new GUI();
-    gui.addColor(guiControls, 'sphereColor').onChange((color) => {
-        sphere.material.color.set(color);
-    });
-    gui.add(guiControls, 'segments', [4, 8, 16, 32]).onChange(updateHemiSphere);
+    gui.add({startSampling}, "startSampling").name("Start Sampling");
+    gui.add({stopSampling}, "stopSampling").name("Stop Sampling");
     gui.add(guiControls, 'arrowRadius', 5, 50).onChange(updateArrowPosition);
     gui.add(guiControls, 'arrowAzimuth', 0, 360).onChange(updateArrowPosition);
-    gui.add(guiControls, 'arrowPolar', 0, 180).onChange(updateArrowPosition);
+    gui.add(guiControls, 'arrowPolar', 0, 90).onChange(updateArrowPosition);
+
+    gui.add(guiControls, 'sampleCount', 1, 1000).step(1);
+    gui.add(guiControls, 'sampleMethod', ['Diffuse', 'Conductor', 'Dielectric']);
+
 
     // camera
 
-    camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 1000);
+    camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 100);
     camera.position.set(15, 20, 30);
     scene.add(camera);
 
     // controls
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.minDistance = 20;
-    controls.maxDistance = 100;
+    controls.minDistance = 10;
+    controls.maxDistance = 50;
     controls.maxPolarAngle = Math.PI / 2;
 
     // ambient light
-
     scene.add(new THREE.AmbientLight(0x666666));
 
     // point light
-
     const light = new THREE.PointLight(0xffffff, 3, 0, 0);
     camera.add(light);
 
     // helper
-
     scene.add(new THREE.AxesHelper(20));
-
-    scene.add(new THREE.GridHelper(100, 10, 0x888888, 0x444444))
+    scene.add(new THREE.GridHelper(50, 10, 0x888888, 0x444444))
 
     const dir = new THREE.Vector3(1, 0, 0); // Direction of the arrow
-    const phi = THREE.MathUtils.degToRad(90 - guiControls.arrowPolar); // Convert polar angle to radians
-    const theta = THREE.MathUtils.degToRad(guiControls.arrowAzimuth);  // Convert azimuthal angle to radians
-    const arrowPosition = new THREE.Vector3(
-        guiControls.arrowRadius * Math.sin(phi) * Math.cos(theta),
-        guiControls.arrowRadius * Math.cos(phi),
-        guiControls.arrowRadius * Math.sin(phi) * Math.sin(theta)
-    );
+    const theta = THREE.MathUtils.degToRad(guiControls.arrowAzimuth);
+    const phi = THREE.MathUtils.degToRad(90 - guiControls.arrowPolar);
+    arrowPosition = new THREE.Vector3(guiControls.arrowRadius * Math.sin(phi) * Math.cos(theta), guiControls.arrowRadius * Math.sin(phi) * Math.sin(theta), guiControls.arrowRadius * Math.cos(phi)); // standard cartesian coordinate
+
+    console.log('standard coordinate arrowPosition: ', arrowPosition);
+    // Init incident ray arrow
     const length = 5;
     const hex = 0xff0000; // Color of the arrow
-    arrow = new THREE.ArrowHelper(dir, arrowPosition, length, hex);
+    let arrowPositionClone = transferToRightHandCoordinate(arrowPosition); // right hand coordinate
+
+    console.log('right hand coordinate arrowPosition', arrowPositionClone);
+    arrow = new THREE.ArrowHelper(dir, arrowPositionClone, length, hex);
     updateArrowPosition();
     scene.add(arrow);
 
-    hemisphere = buildHemisphere(15, guiControls.segments);
-    scene.add(hemisphere);
+
 }
 
 function animate() {
 
     requestAnimationFrame(animate);
+
+    if (isSamplingActive && currentSampleCount < guiControls.sampleCount) {
+        performSampling();
+        currentSampleCount++;
+
+    }
 
     render();
 
@@ -99,7 +109,7 @@ function render() {
 
 function updateArrowPosition() {
     const phi = THREE.MathUtils.degToRad(90 - guiControls.arrowPolar); // Convert polar angle to radians
-    const theta = THREE.MathUtils.degToRad(guiControls.arrowAzimuth);  // Convert azimuthal angle to radians
+    const theta = THREE.MathUtils.degToRad(guiControls.arrowAzimuth);
 
     arrow.position.x = guiControls.arrowRadius * Math.sin(phi) * Math.cos(theta);
     arrow.position.y = guiControls.arrowRadius * Math.cos(phi);
@@ -108,132 +118,97 @@ function updateArrowPosition() {
     // Update the arrow's direction to always point to the origin
     const direction = new THREE.Vector3().subVectors(new THREE.Vector3(0, 0, 0), arrow.position).normalize();
     arrow.setDirection(direction);
+
 }
 
-function buildHemisphere(radius, segments) {
-    const group = new THREE.Group();
-    const azimuthalStep = Math.PI * 2 / segments;
-    const polarStep = Math.PI / 2 / segments;
-
-    for (let phi = 0; phi < Math.PI * 2; phi += azimuthalStep) {
-        for (let theta = 0; theta < Math.PI / 2; theta += polarStep) {
-            const x = radius * Math.sin(theta) * Math.cos(phi);
-            const z = radius * Math.sin(theta) * Math.sin(phi);
-            const y = radius * Math.cos(theta);
-
-            // 创建长方体
-            const length = radius; // 长方体的长度
-            const boxGeometry = new THREE.BoxGeometry(0.1, 0.1, length); // 长方体的尺寸
-            const boxMaterial = new THREE.MeshBasicMaterial({color: 0x808080}); // 长方体的颜色
-            const cube = new THREE.Mesh(boxGeometry, boxMaterial);
-
-            cube.position.set(x / 2, y / 2, z / 2);
-
-            cube.lookAt(new THREE.Vector3(x, y, z));
-
-            group.add(cube);
-        }
-    }
-
-    return group;
+function transferToRightHandCoordinate(vector) {
+    const vectorClone = vector.clone();
+    vectorClone.y = vector.z;
+    vectorClone.z = vector.y;
+    return vectorClone;
 }
 
-function updateHemiSphere() {
-    if (hemisphere) {
-        scene.remove(hemisphere);
-    }
-    hemisphere = buildHemisphere(15, guiControls.segments);
-    scene.add(hemisphere);
+function transferToStandardCoordinate(vector) {
+    const vectorClone = vector.clone();
+    vectorClone.y = vector.z;
+    vectorClone.z = vector.y;
+    return vectorClone;
 }
 
-function updateDiffuse(segments, sampleCount = 10000) {
-    const azimuthalSegments = segments;
-    const polarSegments = segments;
-    let distribution = Array.from(Array(azimuthalSegments), () => new Array(polarSegments).fill(0));
-
-    const azimuthalFactor = azimuthalSegments / (2 * Math.PI);
-    const polarFactor = polarSegments / Math.PI;
-
-    for (let i = 0; i < sampleCount; i++) {
-        let u = new THREE.Vector2(Math.random(), Math.random());
-        let wi = SampleDiffuse(u);
-
-        let azimuthalAngle = Math.atan2(wi.y, wi.x);
-        let polarAngle = Math.acos(wi.z / wi.length());
-
-        let azimuthalIndex = Math.floor((azimuthalAngle + Math.PI) * azimuthalFactor) % azimuthalSegments;
-        let polarIndex = Math.floor(polarAngle * polarFactor);
-
-        distribution[azimuthalIndex][polarIndex]++;
+function startSampling() {
+    isSamplingActive = true;
+    currentSampleCount = 0;
+    // clean up previous sampling
+    for (let i = 0; i < wiArrows.length; i++) {
+        scene.remove(wiArrows[i]);
     }
-
-    for (let i = 0; i < azimuthalSegments; i++) {
-        for (let j = 0; j < polarSegments; j++) {
-            distribution[i][j] /= sampleCount;
-        }
-    }
-
-    return distribution;
+    wis = [];
+    performSampling();
 }
 
-function updateConductor(wo, segments, sampleCount = 10000) {
-    const azimuthalSegments = segments;
-    const polarSegments = segments;
-    let distribution = Array.from(Array(azimuthalSegments), () => new Array(polarSegments).fill(0));
-
-    const azimuthalFactor = azimuthalSegments / (2 * Math.PI);
-    const polarFactor = polarSegments / Math.PI;
-
-    for (let i = 0; i < sampleCount; i++) {
-        let u = new THREE.Vector2(Math.random(), Math.random());
-        let wi = SampleConductor(wo, u, 0.5, 0.5);
-
-        let azimuthalAngle = Math.atan2(wi.y, wi.x);
-        let polarAngle = Math.acos(wi.z / wi.length());
-
-        let azimuthalIndex = Math.floor((azimuthalAngle + Math.PI) * azimuthalFactor) % azimuthalSegments;
-        let polarIndex = Math.floor(polarAngle * polarFactor);
-
-        distribution[azimuthalIndex][polarIndex]++;
-    }
-
-    for (let i = 0; i < azimuthalSegments; i++) {
-        for (let j = 0; j < polarSegments; j++) {
-            distribution[i][j] /= sampleCount;
-        }
-    }
-
-    return distribution;
+function stopSampling() {
+    isSamplingActive = false;
 }
 
-function updateDielectric(wo, segments, sampleCount = 10000) {
-    const azimuthalSegments = segments;
-    const polarSegments = segments;
-    let distribution = Array.from(Array(azimuthalSegments), () => new Array(polarSegments).fill(0));
 
-    const azimuthalFactor = azimuthalSegments / (2 * Math.PI);
-    const polarFactor = polarSegments / Math.PI;
+function performSampling() {
+    const wo = transferToStandardCoordinate(arrow.position).normalize();
+    console.log('wo in standard coordinate: ', wo);
+    let wi,
+        u = new THREE.Vector2(GetRandomSample(), GetRandomSample());
 
-    for (let i = 0; i < sampleCount; i++) {
-        let u = new THREE.Vector2(Math.random(), Math.random());
-        let wi = SampleConductor(wo, u, 0.5, 0.5, 1., 1.5);
+    switch (guiControls.sampleMethod) {
+        case 'Diffuse':
+            wi = SampleDiffuse(u);
+            console.log('wi in standard coordinate: ', wi);
+            wi = transferToRightHandCoordinate(wi);
+            console.log('wi in right hand coordinate: ', wi);
+            break;
+        case 'Conductor':
+            wi = SampleConductor(wo, u, 0.2, 0.2);
+            console.log('wi in standard coordinate: ', wi);
+            wi = transferToRightHandCoordinate(wi);
+            console.log('wi in right hand coordinate: ', wi);
+            break;
+        case 'Dielectric':
+            wi = SampleDielectric(wo, u, 0.2, 0.2, 1., 1.5);
+            console.log('wi in standard coordinate: ', wi);
+            wi = transferToRightHandCoordinate(wi);
+            console.log('wi in right hand coordinate: ', wi);
+            break;
 
-        let azimuthalAngle = Math.atan2(wi.y, wi.x);
-        let polarAngle = Math.acos(wi.z / wi.length());
-
-        let azimuthalIndex = Math.floor((azimuthalAngle + Math.PI) * azimuthalFactor) % azimuthalSegments;
-        let polarIndex = Math.floor(polarAngle * polarFactor);
-
-        distribution[azimuthalIndex][polarIndex]++;
+        default:
+            alert('Unknown sample method: ' + guiControls.sampleMethod)
+            return;
     }
 
-    for (let i = 0; i < azimuthalSegments; i++) {
-        for (let j = 0; j < polarSegments; j++) {
-            distribution[i][j] /= sampleCount;
-        }
+    if (wi && wi.length() !== 0) {
+        wis.push(wi);
+        updateWiArrow(wi);
     }
 
-    return distribution;
+    currentSampleCount++;
+    if (currentSampleCount === guiControls.sampleCount) {
+        isSamplingActive = false;
+    }
 }
+
+
+function updateWiArrow(wi) {
+
+
+    const arrowDir = wi.clone().normalize();
+    const arrowColor = 0x00ff00;
+    const arrowLength = 5;
+    const arrow = new THREE.ArrowHelper(arrowDir, new THREE.Vector3(0, 0, 0), arrowLength, arrowColor);
+
+    scene.add(arrow);
+    wiArrows.push(arrow);
+
+}
+
+
+
+
 
 
