@@ -1,22 +1,25 @@
-let contentsBounds = document.body.getBoundingClientRect();
-let width = 800;
-let height = 500;
-let ratio = contentsBounds.width / width;
-width *= ratio;
-height *= ratio;
-let alpha = 0.2
+function drawBSDF(roughness) {
+  let bsdfElement = document.getElementById("bsdf");
+  let bounds = bsdfElement.getBoundingClientRect();
+  let width = bounds.width;
+  let height = bounds.height;
 
-functionPlot({
+  const alpha = roughness;  // Set alpha to the value of roughness
+
+  functionPlot({
     target: "#bsdf",
     grid: true,
+    disableZoom: true,
+    disablePan: true,
     width,
     height,
-    xAxis: { domain: [-90, 90]},
+    xAxis: { domain: [-90, 90] },
     yAxis: { domain: [-1, 9] },
     data: [
-      { 
-        fn: '(a^2)/(PI*((cos(x*PI/180))^4) * ((a^2)+((tan(x*PI/180))^2))^2)',
-        scope: { a: alpha }
+      {
+        fn: `(${alpha}^2)/(PI*((cos(x*PI/180))^4) * ((${alpha}^2)+((tan(x*PI/180))^2))^2)`,
+        color: 'white'
       }
     ]
   });
+}
