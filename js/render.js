@@ -159,7 +159,7 @@ function processPixelArray() {
     }
 
     // y axis markers
-     for (let i = 2000; i < maxValue; i+=4000) {
+     for (let i = 2000; i < maxValue; i+=7000) {
         svg.append("path")
         .attr("d", `M ${15},${(i/maxValue)*(svgHeight-15)} L ${10},${(i/maxValue)*(svgHeight-15)}`) 
         .attr("stroke", "white") // Set the stroke color to white
@@ -170,7 +170,7 @@ function processPixelArray() {
         .attr("transform", `rotate(90) translate(${(i / maxValue) * (svgHeight - 15)}, 0)`)
         .text(Math.ceil((maxValue-i) / 100) * 100)
         .attr("fill", "white") // Set text color to white
-        .attr("font-size", "7px") // Set font size
+        .attr("font-size", "8px") // Set font size
         .attr("text-anchor", "middle"); // Align text to the center
     }
 
@@ -202,10 +202,14 @@ function updateSlider() {
         var roughnessForm = document.getElementById("roughnessForm");
         // Hide the form
         roughnessForm.style.display = "none";
+        d3.select(".non-diffuse-text").style("display", "none");
+        d3.select(".diffuse-text").style("display", "block");
     } else {
         drawMicrofacetBSDF(roughnessValue);
         var roughnessForm = document.getElementById("roughnessForm");
         // Hide the form
         roughnessForm.style.display = "block";
+        d3.select(".non-diffuse-text").style("display", "block");
+        d3.select(".diffuse-text").style("display", "none");
     }
 }
