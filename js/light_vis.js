@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GUI} from "dat.gui";
-import {GetRandomSample, SampleConductor, SampleDiffuse, SampleDielectric} from "./sample.js";
+import {GetRandomSample, SampleConductor, SampleDielectric, SampleDiffuse} from "./sample.js";
 
 let camera, scene, renderer, arrow;
 
@@ -13,12 +13,44 @@ let wiArrows = [];
 let isSamplingActive = false;
 let currentSampleCount = 0;
 
+let materialSelect = document.getElementById("material").value;
+let roughnessValue = document.getElementById("slider").value;
+
+let roughnessControl;
+
+const materialOptions = [
+    'Cyan',
+    'Orange',
+    'Purple',
+    'Aluminium',
+    'Gold',
+    'Cooper',
+    'Tungsten',
+    'Dielectric'
+];
+
+const materialCategories = {
+    'Cyan': 'Diffuse',
+    'Orange': 'Diffuse',
+    'Purple': 'Diffuse',
+    'Aluminium': 'Conductor',
+    'Gold': 'Conductor',
+    'Cooper': 'Conductor',
+    'Tungsten': 'Conductor',
+    'Dielectric': 'Dielectric'
+};
+
+
 const guiControls = {
-    arrowRadius: 20,      // Initial radius of the arrow's position
+    materialType: materialCategories[materialOptions[materialSelect]],
+    material: materialOptions[materialSelect],
+    arrowRadius: 15,      // Initial radius of the arrow's position
     arrowAzimuth: 183,      // Initial azimuthal angle (in degrees)
     arrowPolar: 45,        // Initial polar angle (in degrees)
-    sampleCount: 10, sampleMethod: 'Conductor', sampleRoughness: 0.5,
+    sampleCount: 100,
+    sampleRoughness: roughnessValue,
 };
+
 
 init();
 animate();
@@ -34,17 +66,21 @@ function init() {
     sceneElement.appendChild(renderer.domElement);
 
     const gui = new GUI();
+
     gui.add({startSampling}, "startSampling").name("Start Sampling");
     gui.add({stopSampling}, "stopSampling").name("Stop Sampling");
+
+    gui.add(guiControls, 'materialType');
+    gui.add(guiControls, 'material');
     gui.add(guiControls, 'arrowRadius', 5, 50).onChange(updateArrowPosition);
     gui.add(guiControls, 'arrowAzimuth', 0, 360).onChange(updateArrowPosition);
     gui.add(guiControls, 'arrowPolar', 0, 90).onChange(updateArrowPosition);
 
     gui.add(guiControls, 'sampleCount', 1, 1000).step(1);
-    gui.add(guiControls, 'sampleMethod', ['Diffuse', 'Conductor', 'Dielectric']);
 
     const guiElement = document.querySelector('.control-panel');
     guiElement.appendChild(gui.domElement);
+
 
     // camera
 
@@ -84,9 +120,34 @@ function init() {
     console.log('right hand coordinate arrowPosition', arrowPositionClone);
     arrow = new THREE.ArrowHelper(dir, arrowPositionClone, length, hex);
     updateArrowPosition();
+
     scene.add(arrow);
 
+    const materialSelectButton = document.querySelector('input[type="submit"]');
 
+    materialSelectButton.addEventListener('click', function (event) {
+        materialSelect = document.getElementById("material").value;
+        let material = materialOptions[materialSelect];
+        let materialType = materialCategories[material];
+
+        guiControls.materialType = materialType;
+        guiControls.material = material;
+
+        if (materialType !== 'Diffuse' && roughnessControl === undefined) {
+            roughnessControl = gui.add(guiControls, 'sampleRoughness');
+        }
+
+
+        gui.updateDisplay();
+    });
+
+    const roughnessApplyButton = document.querySelector('button[type="submit"]');
+
+    roughnessApplyButton.addEventListener('click', function (event) {
+        roughnessValue = document.getElementById("slider").value;
+        guiControls.sampleRoughness = roughnessValue;
+        gui.updateDisplay();
+    });
 }
 
 function animate() {
@@ -159,7 +220,7 @@ function performSampling() {
     let wi,
         u = new THREE.Vector2(GetRandomSample(), GetRandomSample());
 
-    switch (guiControls.sampleMethod) {
+    switch (guiControls.materialType) {
         case 'Diffuse':
             wi = SampleDiffuse(u);
             console.log('wi in standard coordinate: ', wi);
@@ -167,13 +228,13 @@ function performSampling() {
             console.log('wi in right hand coordinate: ', wi);
             break;
         case 'Conductor':
-            wi = SampleConductor(wo, u, 0.2, 0.2);
+            wi = SampleConductor(wo, u, guiControls.sampleRoughness, guiControls.sampleRoughness);
             console.log('wi in standard coordinate: ', wi);
             wi = transferToRightHandCoordinate(wi);
             console.log('wi in right hand coordinate: ', wi);
             break;
         case 'Dielectric':
-            wi = SampleDielectric(wo, u, 0.2, 0.2, 1., 1.5);
+            wi = SampleDielectric(wo, u, guiControls.sampleRoughness, guiControls.sampleRoughness, 1., 1.5);
             console.log('wi in standard coordinate: ', wi);
             wi = transferToRightHandCoordinate(wi);
             console.log('wi in right hand coordinate: ', wi);
@@ -200,10 +261,16 @@ function updateWiArrow(wi) {
 
 
     const arrowDir = wi.clone().normalize();
-    const arrowColor = 0x00ff00;
-    const arrowLength = 5;
+    const arrowColor = 0x7EC0EE;
+    const arrowLength = 15;
     const arrow = new THREE.ArrowHelper(arrowDir, new THREE.Vector3(0, 0, 0), arrowLength, arrowColor);
-
+    arrow.cone.visible = false;
+    arrow.line.material = new THREE.MeshBasicMaterial({
+        color: arrowColor,
+        transparent: true,
+        opacity: 0.8
+    });
+    console.log(arrow)
     scene.add(arrow);
     wiArrows.push(arrow);
 
